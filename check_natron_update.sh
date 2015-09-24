@@ -46,12 +46,27 @@ function tray_clignote () {
 	done &
 }
 
+check_commit () {
+        if uname -m | grep -q x86_64
+    then
+	BIT=64
+    else
+	BIT=32
+    fi
+    LOG=$(wget -qO - http://downloads.natron.fr/Linux/snapshots/${BIT}bit/logs/ | grep -e "natron.Linux${BIT}.*\.log" | sed -e 's/^.*href="//' -e 's/">natron.*$//')
+    COMMIT=$(wget -qO - http://downloads.natron.fr/Linux/snapshots/${BIT}bit/logs/${LOG} | sed -e '/Building Natron/!d' | cut -d" " -f3)
+    COMMIT_INFO="Commit: <span color='blue'><b>${COMMIT}</b></span>\n\n"
+    COMMIT_TEXT="Commit: $(echo ${COMMIT} | sed 's/^\(.......\).*/\1/')"
+    echo tooltip:"Natron Updates\n${COMMIT_TEXT}" >&3
+}
+
 # check if an update is avalaible
 function check () {
-    sleep 3 # if check is launch after $NATRON_UPDATER, avoid blink icon to stay on 'green'
     BLINKING=$1
     exec 3<> $PIPE
     echo "function check(): Check Updates " # DEBUG
+    check_commit
+    sleep 3 # if check is launch after $NATRON_UPDATER, avoid blink icon to stay on 'green'
     if ! $NATRON_CHECK | grep 'no updates' ; then
         # check if already blinking to avoid multiple tray_clignote()
 	if cat $BLINKING | grep -q 0;then
@@ -64,7 +79,7 @@ function check () {
 	    exec 4<> $LAUNCHER
 	    update_launcher 1 # set flag launcher to 1
 	fi
-	notify-send "NATRON SNAPSHOT" "\nUpdates are available for Natron Snapshot\nCommit: ${COMMIT_TEXT}" -i "${ICON_NATRON}"
+	notify-send "NATRON SNAPSHOT" "\nUpdates are available for Natron Snapshot\n${COMMIT_TEXT}" -i "${ICON_NATRON}"
     else
 	if [ -n $UNITY ];then
 	    exec 4<> $LAUNCHER
@@ -237,6 +252,7 @@ export -f read_xml
 export -f info_update
 export -f quit
 export PID=$$
+export LOG COMMIT COMMIT_INFO COMMIT_TEXT
 # timeout between check update (in seconds)
 TIMEOUT=300 # Default 5 mn
 # create FIFO file, tray-icon yad function need it to listening command input
@@ -249,21 +265,11 @@ export BLINKING="$(mktemp  -u --tmpdir ${0##*/}_blinking.XXXXXXXX)"
 echo 0 > $BLINKING # start without blinking !!
 #### /SETTING #####################################
 
-if uname -m | grep x86_64
-then
-    export BIT=64
-else
-    export BIT=32
-fi
-export LOG=$(wget -qO - http://downloads.natron.fr/Linux/snapshots/${BIT}bit/logs/ | grep -e "natron.Linux${BIT}.*\.log" | sed -e 's/^.*href="//' -e 's/">natron.*$//')
-export COMMIT=$(wget -qO - http://downloads.natron.fr/Linux/snapshots/${BIT}bit/logs/${LOG} | sed -e '/Building Natron/!d' | cut -d" " -f3)
-export COMMIT_INFO="Commit: <span color='blue'><b>${COMMIT}</b></span>\n\n"
-export COMMIT_TEXT=" $(echo ${COMMIT} | sed 's/^\(.......\).*/\1/')"
-
+check_commit
 yad --notification \
     --listen \
     --image="${ICON_NATRON}" \
-    --text="Natron updates Commit: ${COMMIT_TEXT}" \
+    --text="Natron updates ${COMMIT_TEXT}" \
     --item-separator ":" \
     --command="bash -c '${NATRON_UPDATER}; check ${BLINKING}'"  <&3 & export PID_YAD="$!"
     
