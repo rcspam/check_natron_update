@@ -85,7 +85,8 @@ function read_xml () {
 # Display info updates
 function info_update () {
     SUF="\n\t\t<big><b>Natron Updates:\n\t\t-------------------------</b></big>\n\n\n"
-    if ! ps aux | grep -v grep | grep "NatronSetup"
+    #if ! ps aux | grep -v grep | grep "NatronSetup"
+    if ! pidof "NatronSetup"
     then
 	INFO_TEXT=$(read_xml | awk -F "!" '{printf "<big><b>%s</b></big>  Version %s\n",$1,$2}')
 	if cat $BLINK | grep -q "1";then
@@ -94,7 +95,7 @@ function info_update () {
 	    INFO="<big>${SUF}<span color='red'>\t\tNo Updates for now !</span></big>"
 	fi
     else
-	INFO="<big>${SUF}<span color='red'>\t\tNo Info available for now because,\n\t\t'NatronSetup' already running !</span></big>"
+	INFO="<big>${SUF}<span color='red'>\t\tImpossible to display Infos,\n\t\t'NatronSetup' already running !</span></big>"
     fi
     yad --center --on-top --title="Natron Update Info" --width=425 --height=280 --image="info" --text="${INFO}" --button="Fermer:0"  &
     }
