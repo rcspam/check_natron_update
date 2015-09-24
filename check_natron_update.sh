@@ -175,8 +175,9 @@ echo $XDG_CURRENT_DESKTOP | grep -q -i 'Unity' && export UNITY=1 || export UNITY
 # Set your paths here
 # Natron install directory
 #NATRON_SNAPSHOT_PATH="/Path/to/Natron_Directory"
+
 # blinking natron icons are installed in ${HOME}/.icons by default
-#HOME_ICON_PATH="/Path/to/Natron/icon_Directory" # blinking natron icons are installed in ${HOME}/.icons by default
+#HOME_ICON_PATH="/Path/to/Natron/icon_Directory"
 NATRON_SNAPSHOT_PATH="${HOME}/bin/Natron_snapshot"
 HOME_ICON_PATH="${HOME}/.icons"
 
@@ -200,7 +201,7 @@ fi
 ICON_INFO="${ICON_PATH_STATUS}/info.${EXT}"
 ICON_RELOAD="${ICON_PATH_ACTION}/reload.${EXT}"
 ICON_QUIT="${ICON_PATH_ACTION}/exit.${EXT}"
-## ...If it doesn't match you can uncomment and set path to your owned icons here if it's failed !
+## ...If it doesn't match you can uncomment and set your own icons here if it's failed !
 #ICON_INFO=""
 #ICON_RELOAD=""
 #ICON_QUIT=""
