@@ -1,5 +1,5 @@
-#Tray icon bash script to check natron updates.
-When updates are available:
+#Tray icon bash script to check natron snapshot updates.
+When snapshot updates are available:
 
 - ![natron_blink](https://cloud.githubusercontent.com/assets/10021906/10069708/2f133234-62ae-11e5-9474-18d31b218ffa.gif) Tray icon blinks.
 
