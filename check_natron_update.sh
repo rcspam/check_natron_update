@@ -48,6 +48,7 @@ function tray_clignote () {
 
 # check if an update is avalaible
 function check () {
+    sleep 3 # if check is launch after $NATRON_UPDATER, avoid blink icon to stay on 'green'
     BLINKING=$1
     exec 3<> $PIPE
     echo "function check(): Check Updates " # DEBUG
@@ -228,7 +229,7 @@ export NATRON_UPDATER="${NATRON_SNAPSHOT_PATH}/NatronSetup --updater"
 export NATRON_CHECK="${NATRON_SNAPSHOT_PATH}/NatronSetup --checkupdates --verbose"
 export ICON_NATRON="${HOME_ICON_PATH}/natron22.png"
 export ICON_NATRON_BLINK="${HOME_ICON_PATH}/natron22-green.png"
-ICON_NATRON_16="${HOME_ICON_PATH}/natron16.png"
+export ICON_NATRON_MENU="${HOME_ICON_PATH}/natron16.png"
 export INFO_TEXT=$(${NATRON_CHECK} | sed -e '/fetching metadata of/!d' -e 's/fr.inria.//g' -e 's/"//g' |  awk '{printf "<big><b>%s</b></big>  Version %s\n",$4,$7}')
 export -f tray_clignote
 export -f check
@@ -269,7 +270,7 @@ yad --notification \
 #Tray-icon contextual menu  
 tray_menu="menu:"
 tray_menu_1="Check updates now:bash -c 'check ${BLINKING}':${ICON_RELOAD}"
-tray_menu_2="Launch NatronSetup:bash -c '${NATRON_UPDATER}; check ${BLINKING}':${ICON_NATRON_16}"
+tray_menu_2="Launch NatronSetup:bash -c '${NATRON_UPDATER}; check ${BLINKING}':${ICON_NATRON_MENU}"
 tray_menu_3="Updates Info:bash -c 'info_update':${ICON_INFO}"
 tray_menu_quit="Quit:bash -c 'quit ${PID} ${PID_YAD} ${BLINK} ${PIPE} ${BLINKING} ${PID_UPDATE_COUNT_SCRIPT} ${LAUNCHER} ${UPDATE_COUNT_SCRIPT}':${ICON_QUIT}"
 # Send 'menu' to yad
