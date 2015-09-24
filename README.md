@@ -12,7 +12,7 @@ When updates are available:
 
 #Installation
 - Simply copy **check_natron_update.sh** in your path (i.e. $HOME/bin)
-- Copy the icons **natron22.png** and **natron22.png** in your home icon directory (i.e. $HOME/.icons)
+- Copy the icons **natron22.png**, **natron22.png**, **natron16.png** in your home icon directory (i.e. $HOME/.icons)
 
 - Open script in an editor to set directory paths at line ~176:
 
