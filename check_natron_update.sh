@@ -63,7 +63,7 @@ function check () {
 	    exec 4<> $LAUNCHER
 	    update_launcher 1 # set flag launcher to 1
 	fi
-	notify-send "NATRON SNAPSHOT" "\nUpdates are available for Natron Snapshot " -i "${ICON_NATRON}"
+	notify-send "NATRON SNAPSHOT" "\nUpdates are available for Natron Snapshot\nCommit: ${COMMIT_TEXT}" -i "${ICON_NATRON}"
     else
 	if [ -n $UNITY ];then
 	    exec 4<> $LAUNCHER
@@ -86,15 +86,7 @@ function read_xml () {
 # wget -qO -  http://downloads.natron.fr/Linux/snapshots/64bit/logs/^Ctron.Linux64.201509241204.log | sed -e '/Building Natron/!d' | cut -d" " -f3
 # wget -qO - http://downloads.natron.fr/Linux/snapshots/${bit}bit/logs/ | grep -e "natron.Linux${bit}.*\.log" | sed -e 's/^.*href="//' -e 's/<\/a>.*$//'
 function info_update () {
-    if uname -m | grep x86_64
-    then
-	BIT=64
-    else
-	BIT=32
-    fi
-    LOG=$(wget -qO - http://downloads.natron.fr/Linux/snapshots/${BIT}bit/logs/ | grep -e "natron.Linux${BIT}.*\.log" | sed -e 's/^.*href="//' -e 's/">natron.*$//')
-    COMMIT=$(wget -qO - http://downloads.natron.fr/Linux/snapshots/${BIT}bit/logs/${LOG} | sed -e '/Building Natron/!d' | cut -d" " -f3)
-    COMMIT_INFO="Commit: <span color='blue'><b>${COMMIT}</b></span>\n\n"
+
     SUF="\n\t\t<big><b>Natron Updates:\n\t\t-------------------------</b></big>\n\n\n"
     #if ! ps aux | grep -v grep | grep "NatronSetup"
     if ! pidof "NatronSetup"
@@ -256,10 +248,21 @@ export BLINKING="$(mktemp  -u --tmpdir ${0##*/}_blinking.XXXXXXXX)"
 echo 0 > $BLINKING # start without blinking !!
 #### /SETTING #####################################
 
+if uname -m | grep x86_64
+then
+    export BIT=64
+else
+    export BIT=32
+fi
+export LOG=$(wget -qO - http://downloads.natron.fr/Linux/snapshots/${BIT}bit/logs/ | grep -e "natron.Linux${BIT}.*\.log" | sed -e 's/^.*href="//' -e 's/">natron.*$//')
+export COMMIT=$(wget -qO - http://downloads.natron.fr/Linux/snapshots/${BIT}bit/logs/${LOG} | sed -e '/Building Natron/!d' | cut -d" " -f3)
+export COMMIT_INFO="Commit: <span color='blue'><b>${COMMIT}</b></span>\n\n"
+export COMMIT_TEXT=" $(echo ${COMMIT} | sed 's/^\(.......\).*/\1/')"
+
 yad --notification \
     --listen \
     --image="${ICON_NATRON}" \
-    --text="Check Natron updates" \
+    --text="Natron updates Commit: ${COMMIT_TEXT}" \
     --item-separator ":" \
     --command="bash -c '${NATRON_UPDATER}; check ${BLINKING}'"  <&3 & export PID_YAD="$!"
     
