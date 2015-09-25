@@ -39,9 +39,9 @@ function tray_clignote () {
 	exec 3<> $PIPE
 	echo "function tray_clignote()" # DEBUG
 	while [ -e $BLINK ] && cat $BLINK | grep -q "1"; do
-		echo "icon:${ICON_NATRON}" >&3
-		sleep 0.5
 		echo "icon:${ICON_NATRON_BLINK}" >&3
+		sleep 0.5
+		echo "icon:${ICON_NATRON}" >&3
 		sleep 0.5
 	done &
 }
@@ -66,7 +66,7 @@ function check () {
     exec 3<> $PIPE
     echo "function check(): Check Updates " # DEBUG
     check_commit
-    sleep 3 # if check is launch after $NATRON_UPDATER, avoid blink icon to stay on 'green'
+    #sleep 3 # if check is launch after $NATRON_UPDATER, avoid blink icon to stay on 'green'
     if ! $NATRON_CHECK | grep 'no updates' ; then
         # check if already blinking to avoid multiple tray_clignote()
 	if cat $BLINKING | grep -q 0;then
@@ -247,6 +247,7 @@ export ICON_NATRON_BLINK="${HOME_ICON_PATH}/natron22-green.png"
 export ICON_NATRON_MENU="${HOME_ICON_PATH}/natron16.png"
 export INFO_TEXT=$(${NATRON_CHECK} | sed -e '/fetching metadata of/!d' -e 's/fr.inria.//g' -e 's/"//g' |  awk '{printf "<big><b>%s</b></big>  Version %s\n",$4,$7}')
 export -f tray_clignote
+export -f check_commit
 export -f check
 export -f read_xml
 export -f info_update
