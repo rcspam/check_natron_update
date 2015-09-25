@@ -66,7 +66,6 @@ function check () {
     exec 3<> $PIPE
     echo "function check(): Check Updates " # DEBUG
     check_commit
-    #sleep 3 # if check is launch after $NATRON_UPDATER, avoid blink icon to stay on 'green'
     if ! $NATRON_CHECK | grep 'no updates' ; then
         # check if already blinking to avoid multiple tray_clignote()
 	if cat $BLINKING | grep -q 0;then
