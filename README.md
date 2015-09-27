@@ -20,6 +20,7 @@ Launch 'NatronSetup --updater'
 
 #Installation
 - Simply copy **check_natron_update.sh** in your path (i.e. $HOME/bin)
+
 - Copy the icons **natron22.png**, **natron22.png**, **natron16.png** in your home icon directory (i.e. $HOME/.icons)
 
 - Open script in an editor to set directory paths at line ~176:
@@ -29,6 +30,13 @@ Launch 'NatronSetup --updater'
 
         # blinking natron icons are installed in ${HOME}/.icons by default
         HOME_ICON_PATH="/Path/to/Natron/icon_Directory"
+
+- Open **check_natron_update.desktop** to set the right path to 'Exec=' line 3:
+        [Desktop Entry]
+        Type=Application
+        Exec=$HOME/bin/check_natron_update
+        ...
+ then copy **check_natron_update.desktop** in your ~/.config/autostart or/and if you are a kde user to ~/.kde/autostart
 
 # Match your icon theme if needed
 - If check_natron_update tray icon menu doesn't match your icon theme, you can set the icon at line ~204:
