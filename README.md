@@ -19,7 +19,7 @@ Launch 'NatronSetup --updater'
 ![screenshot3](https://cloud.githubusercontent.com/assets/10021906/10069704/2731ad20-62ae-11e5-9e56-03736b3c4725.png)
 
 #Installation
-- Simply copy **check_natron_update.sh** in your path (i.e. $HOME/bin)
+- Simply copy **check_natron_update.sh** in your $PATH (i.e. $HOME/bin)
 
 - Copy the icons **natron22.png**, **natron22.png**, **natron16.png** in your home icon directory (i.e. $HOME/.icons)
 
