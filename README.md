@@ -12,14 +12,15 @@ Unity Desktop: A count flag is add on the Natron launcher:
 
 ![selection_001](https://cloud.githubusercontent.com/assets/10021906/10069997/03ce4710-62b0-11e5-9162-f12d2cf422c4.png)
 
-####Right Click: 
+####Left Click: 
 Launch 'NatronSetup --updater'
 
-####Left Click Menu:
+####Right Click Menu:
 ![screenshot3](https://cloud.githubusercontent.com/assets/10021906/10069704/2731ad20-62ae-11e5-9e56-03736b3c4725.png)
 
 #Installation
 - Simply copy **check_natron_update.sh** in your path (i.e. $HOME/bin)
+
 - Copy the icons **natron22.png**, **natron22.png**, **natron16.png** in your home icon directory (i.e. $HOME/.icons)
 
 - Open script in an editor to set directory paths at line ~176:
@@ -29,6 +30,8 @@ Launch 'NatronSetup --updater'
 
         # blinking natron icons are installed in ${HOME}/.icons by default
         HOME_ICON_PATH="/Path/to/Natron/icon_Directory"
+
+- Copy **check_natron_update.desktop** in your ~/.config/autostart or/and if you are a kde user to ~/.kde/autostart
 
 # Match your icon theme if needed
 - If check_natron_update tray icon menu doesn't match your icon theme, you can set the icon at line ~204:
