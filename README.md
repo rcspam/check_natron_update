@@ -32,6 +32,7 @@ Launch 'NatronSetup --updater'
         HOME_ICON_PATH="/Path/to/Natron/icon_Directory"
 
 - Open **check_natron_update.desktop** to set the right path to 'Exec=' line 3:
+
         [Desktop Entry]
         Type=Application
         Exec=$HOME/bin/check_natron_update
