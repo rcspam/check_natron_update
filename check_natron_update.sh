@@ -7,8 +7,9 @@
 # * On ubuntu/unity you must install an 'old school tray' manager to display tray icons:
 #   (i.e.: indicator-systemtray-unity see http://www.webupd8.org/2015/05/on-demand-system-tray-for-ubuntu.html) 
 
-### FUNCTIONS ###############
-# quit function
+### FUNCTIONS/ ###############
+
+# quit
 function quit () {
     exec 3<> $4 # ${PIPE}
     echo "function quit()" # DEBUG
@@ -46,25 +47,37 @@ function tray_clignote () {
 	done &
 }
 
-check_commit () {
-        if uname -m | grep -q x86_64
-    then
+# Check commit number
+function check_commit () {
+    NATRON_SITE="downloads.natron.fr"
+    exec 3<> $PIPE
+    echo "function check_commit()" # DEBUG
+    while ! ping -W 3 -c 1 $NATRON_SITE > /dev/null 2>&1;do
+	echo "$NATRON_SITE is unreachable" # DEBUG
+	echo tooltip:"Natron Updates\n$NATRON_SITE is unreachable" >&3
+	sleep 3
+    done
+    if uname -m | grep -q x86_64;then
 	BIT=64
     else
 	BIT=32
     fi
+    echo "$NATRON_SITE is UP."
     LOG=$(wget -qO - http://downloads.natron.fr/Linux/snapshots/${BIT}bit/logs/ | grep -e "natron.Linux${BIT}.*\.log" | sed -e 's/^.*href="//' -e 's/">natron.*$//')
-    COMMIT=$(wget -qO - http://downloads.natron.fr/Linux/snapshots/${BIT}bit/logs/${LOG} | sed -e '/Building Natron/!d' | cut -d" " -f3)
-    COMMIT_INFO="Commit: <span color='blue'><b>${COMMIT}</b></span>\n\n"
-    COMMIT_TEXT="Commit: $(echo ${COMMIT} | sed 's/^\(.......\).*/\1/')"
+    COMMIT=$(wget -qO - http://downloads.natron.fr/Linux/snapshots/${BIT}bit/logs/${LOG} | sed -e '/Building Natron/!d' | cut -d" " -f3 | sed 's/^\(.......\).*/\1/')
+    COMMIT_INFO="Commit:  <span color='blue'>${COMMIT}</span>\n\n"
+    COMMIT_TEXT="Commit: $(echo ${COMMIT})"
+    
+    echo "function check_commit(): ${COMMIT_TEXT}" # DEBUG
     echo tooltip:"Natron Updates\n${COMMIT_TEXT}" >&3
 }
 
 # check if an update is avalaible
 function check () {
     BLINKING=$1
+    BLINK=$2
     exec 3<> $PIPE
-    echo "function check(): Check Updates " # DEBUG
+    echo "function check()" # DEBUG
     check_commit
     if ! $NATRON_CHECK | grep 'no updates' ; then
         # check if already blinking to avoid multiple tray_clignote()
@@ -78,21 +91,25 @@ function check () {
 	    exec 4<> $LAUNCHER
 	    update_launcher 1 # set flag launcher to 1
 	fi
+	echo "function check(): Updates are available for Natron Snapshot - ${COMMIT_TEXT}" # DEBUG
 	notify-send "NATRON SNAPSHOT" "\nUpdates are available for Natron Snapshot\n${COMMIT_TEXT}" -i "${ICON_NATRON}"
     else
 	if [ -n $UNITY ];then
 	    exec 4<> $LAUNCHER
 	    update_launcher 0 # reset launcher flag 
-	fi	
-        echo 0 > $BLINK && echo 0 > $BLINKING && echo "icon:${ICON_NATRON}" >&3
+	fi
+	echo "Stop blinking..." # DEBUG	
+	echo 0 > ${BLINK} && echo 0 > ${BLINKING} && echo "icon:${ICON_NATRON}" >&3
     fi
 }
 
 # read xml from 'NatronSetup --checkupdates'
 function read_xml () {
+    echo "function read_xm()" >&2 # DEBUG
     while read line
     do
 	eval $line
+	# set '!' as separator and re-sort date version 
 	echo $name! $(echo -n $version | sed -n -e "s%\(....\)\(..\)\(..\)\(..\)\(..\)%\1-\2-\3 \4:\5%p")
     done < <(${NATRON_CHECK} | sed -e '/<update /!d' -e 's/<update //g' -e 's/\/>//g' -e 's/^.*v/v/g')
 }
@@ -101,12 +118,13 @@ function read_xml () {
 # wget -qO -  http://downloads.natron.fr/Linux/snapshots/64bit/logs/^Ctron.Linux64.201509241204.log | sed -e '/Building Natron/!d' | cut -d" " -f3
 # wget -qO - http://downloads.natron.fr/Linux/snapshots/${bit}bit/logs/ | grep -e "natron.Linux${bit}.*\.log" | sed -e 's/^.*href="//' -e 's/<\/a>.*$//'
 function info_update () {
-
+    echo "function info_update()" # DEBUG
     SUF="\n\t\t<big><b>Natron Updates:\n\t\t-------------------------</b></big>\n\n\n"
     #if ! ps aux | grep -v grep | grep "NatronSetup"
-    if ! pidof "NatronSetup"
+    if ! pidof "NatronSetup" >/dev/null
     then
 	INFO_TEXT=$(read_xml | awk -F "!" '{printf "<big><b>%s</b></big>  Version %s\n",$1,$2}')
+	check_commit
 	if cat $BLINK | grep -q "1";then
 	    INFO="<big>${SUF}${COMMIT_INFO}${INFO_TEXT}</big>"
 	else
@@ -127,8 +145,8 @@ function no_yad () {
     exit 1
 }
 
-# USED ONLY BY UBUNTU UNITY
-# 
+## USED ONLY BY UBUNTU UNITY/
+# update launcher icon
 function update_launcher () {
 	exec 4<> $LAUNCHER
 	#echo send $1 to $LAUNCHER
@@ -172,6 +190,8 @@ EOF
 
     chmod +x ${UPDATE_COUNT_SCRIPT} 
 }
+## /USED ONLY BY UBUNTU UNITY
+
 ### /FUNCTIONS ###############
 
 
@@ -253,8 +273,6 @@ export -f info_update
 export -f quit
 export PID=$$
 export LOG COMMIT COMMIT_INFO COMMIT_TEXT
-# timeout between check update (in seconds)
-TIMEOUT=300 # Default 5 mn
 # create FIFO file, tray-icon yad function need it to listening command input
 export PIPE=$(mktemp -u --tmpdir ${0##*/}_pipe.XXXXXXXX)
 mkfifo $PIPE
@@ -265,26 +283,25 @@ export BLINKING="$(mktemp  -u --tmpdir ${0##*/}_blinking.XXXXXXXX)"
 echo 0 > $BLINKING # start without blinking !!
 #### /SETTING #####################################
 
-check_commit
 yad --notification \
     --listen \
     --image="${ICON_NATRON}" \
     --text="Natron updates ${COMMIT_TEXT}" \
     --item-separator ":" \
-    --command="bash -c '${NATRON_UPDATER}; check ${BLINKING}'"  <&3 & export PID_YAD="$!"
-    
+    --command="bash -c '${NATRON_UPDATER}; check ${BLINKING} ${BLINK}'"  <&3 & export PID_YAD="$!"
 #Tray-icon contextual menu  
 tray_menu="menu:"
-tray_menu_1="Check updates now:bash -c 'check ${BLINKING}':${ICON_RELOAD}"
-tray_menu_2="Launch NatronSetup:bash -c '${NATRON_UPDATER}; check ${BLINKING}':${ICON_NATRON_MENU}"
+tray_menu_1="Check updates now:bash -c 'check ${BLINKING} ${BLINK}':${ICON_RELOAD}"
+tray_menu_2="Launch NatronSetup:bash -c '${NATRON_UPDATER}; check ${BLINKING} ${BLINK}':${ICON_NATRON_MENU}"
 tray_menu_3="Updates Info:bash -c 'info_update':${ICON_INFO}"
 tray_menu_quit="Quit:bash -c 'quit ${PID} ${PID_YAD} ${BLINK} ${PIPE} ${BLINKING} ${PID_UPDATE_COUNT_SCRIPT} ${LAUNCHER} ${UPDATE_COUNT_SCRIPT}':${ICON_QUIT}"
 # Send 'menu' to yad
 echo "${tray_menu}|${tray_menu_1}|${tray_menu_2}|${tray_menu_3}|${tray_menu_quit}" >&3
 
-# Check update every $timeout
+# Check update every $TIMEOUT
+TIMEOUT=300 # Default 5 mn
 while :
 do
-    check ${BLINKING}
+    check ${BLINKING} ${BLINK} 
     sleep ${TIMEOUT}
 done
