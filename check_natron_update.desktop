@@ -6,5 +6,5 @@ NoDisplay=false
 X-GNOME-Autostart-enabled=true
 Name[fr_FR]=Natron Updates
 Name=Natron Updates
-Comment[fr_FR]=Vérifie les updates des snapshots de Natron
-Comment=Check Natron Snapshot updates
+Comment[fr_FR]=Vérifie les updates de Natron
+Comment=Check Natron updates
