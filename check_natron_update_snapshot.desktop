@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=check_natron_update -r snapshots
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[fr_FR]=Natron Snapshot Updates
+Name=Natron Snapshot Updates
+Comment[fr_FR]=Vérifie les updates Snapshot de Natron
+Comment=Check Natron Snapshot updates
