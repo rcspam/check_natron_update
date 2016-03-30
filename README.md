@@ -56,6 +56,7 @@ Launch 'NatronSetup --updater'
         #ICON_QUIT=""
 
 # Unity Desktop Users
+- You must install a standard tray icon manager (i.e. [indicator-systemtray-unity](https://github.com/GGleb/indicator-systemtray-unity))
 - Unity Desktop user can set name of natron launcher (line ~273):
 
         # For Unity Desktop set the name of natron launcher in Unity Dash (without .desktop)
