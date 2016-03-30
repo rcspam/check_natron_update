@@ -21,20 +21,34 @@ Launch 'NatronSetup --updater'
 #Installation
 - Simply copy **check_natron_update.sh** in your $PATH (i.e. $HOME/bin)
 
+- Set its executable flag:
+
+        $ chmod +x $HOME/bin/check_natron_update.sh
+
 - Copy the icons **natron22.png**, **natron22.png**, **natron16.png** in your home icon directory (i.e. $HOME/.icons)
 
-- Open script in an editor to set directory paths at line ~176:
+- Open script in an editor to set directory paths for your release install and the snapshot release at line ~256:
 
         # Natron install directory
-        NATRON_SNAPSHOT_PATH="/Path/to/Natron_Directory"
-
+        NATRON_PATH="/Path/to/Natron_Directory"   
+ and your natron icon path if it's necessary at line ~269
+ 
         # blinking natron icons are installed in ${HOME}/.icons by default
         HOME_ICON_PATH="/Path/to/Natron/icon_Directory"
 
-- Copy **check_natron_update.desktop** in your ~/.config/autostart or/and if you are a kde user to ~/.kde/autostart
+- Copy **check_natron_update.desktop** or **check_natron_update_snapshot.desktop** in your ~/.config/autostart or/and if you are a kde user to ~/.kde/autostart. You can change the
+
+# Usage
+  to check stable release:
+  
+        $ check_natron_update.sh -r releases
+  or to check snapshot release:
+  
+        $ check_natron_update.sh -r snapshots
+        
 
 # Match your icon theme if needed
-- If check_natron_update tray icon menu doesn't match your icon theme, you can set the icon at line ~204:
+- If check_natron_update tray icon menu doesn't match your icon theme, you can set the icon at line ~293:
 
         ## ...If it doesn't match you can uncomment and set your own icons here if it's failed !
         #ICON_INFO=""
@@ -42,10 +56,10 @@ Launch 'NatronSetup --updater'
         #ICON_QUIT=""
 
 # Unity Desktop Users
-- Unity Desktop user can set name of natron launcher (line ~184):
+- Unity Desktop user can set name of natron launcher (line ~273):
 
         # For Unity Desktop set the name of natron launcher in Unity Dash (without .desktop)
-        [ -n $UNITY ] && export DASH_ICON_NAME="Natron2"
+        [ -n $UNITY ] && export DASH_ICON_NAME="Natron"
         
 #Requirements
 
