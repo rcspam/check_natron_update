@@ -62,24 +62,27 @@ function check_commit () {
     NATRON_SITE="downloads.natron.fr"
     exec 3<> $PIPE
     echo "function check_commit()" # DEBUG
-    while ! ping -W 3 -c 1 $NATRON_SITE > /dev/null 2>&1;do
-	echo "$NATRON_SITE is unreachable" # DEBUG
-	echo tooltip:"Natron Updates\n$NATRON_SITE is unreachable" >&3
-	sleep 3
+    while ! ping -W 3 -c 1 $NATRON_SITE > /dev/null 2>&1
+    do
+        echo "$NATRON_SITE is unreachable" # DEBUG
+        echo tooltip:"Natron Updates $RELEASES\n$NATRON_SITE is unreachable" >&3
+        sleep 3
     done
-    if uname -m | grep -q x86_64;then
-	BIT=64
+    if uname -m | grep -q x86_64
+    then
+        BIT=64
     else
-	BIT=32
+        BIT=32
     fi
     echo "$NATRON_SITE is UP."
-    LOG=$(wget -qO - http://downloads.natron.fr/Linux/${RELEASES}/${BIT}bit/logs/ | grep -e "natron.Linux${BIT}.*\.log" | sed -e 's/^.*href="//' -e 's/">natron.*$//')
-    COMMIT=$(wget -qO - http://downloads.natron.fr/Linux/${RELEASES}/${BIT}bit/logs/${LOG} | sed -e '/Building Natron/!d' | cut -d" " -f3 | sed 's/^\(.......\).*/\1/')
+    [[ $RELEASES == "releases" ]] && URL_RELEASES="releases" || URL_RELEASES="snapshots/RB-2.0" # the repository for snapshots has changed
+    LOG=$(wget -qO - http://downloads.natron.fr/Linux/${URL_RELEASES}/${BIT}bit/logs/ | grep -e "natron.Linux${BIT}.*\.log" | sed -e 's/^.*href="//' -e 's/">natron.*$//')
+    COMMIT=$(wget -qO - http://downloads.natron.fr/Linux/${URL_RELEASES}/${BIT}bit/logs/${LOG} | sed -e '/Building Natron/!d' | sed 's/.*Building Natron \(.*\) from.*/\1/'  | sed 's/^\(.......\).*/\1/')
     COMMIT_INFO="Commit:  <span color='blue'>${COMMIT}</span>\n\n"
     COMMIT_TEXT="Commit: $(echo ${COMMIT})"
     
     echo "function check_commit(): ${COMMIT_TEXT}" # DEBUG
-    echo tooltip:"Natron Updates\n${COMMIT_TEXT}" >&3
+    echo tooltip:"Natron Updates $RELEASES\n${COMMIT_TEXT}" >&3
 }
 
 # check if an update is avalaible
@@ -129,7 +132,7 @@ function read_xml () {
 # wget -qO - http://downloads.natron.fr/Linux/${RELEASES}/${bit}bit/logs/ | grep -e "natron.Linux${bit}.*\.log" | sed -e 's/^.*href="//' -e 's/<\/a>.*$//'
 function info_update () {
     echo "function info_update()" # DEBUG
-    SUF="\n\t\t<big><b>Natron Updates:\n\t\t-------------------------</b></big>\n\n\n"
+    SUF="\n\t\t<big><b>Natron Updates $RELEASES:\n\t\t-------------------------</b></big>\n\n\n"
     #if ! ps aux | grep -v grep | grep "NatronSetup"
     if ! pidof "NatronSetup" >/dev/null
     then
@@ -143,7 +146,7 @@ function info_update () {
     else
 	INFO="<big>${SUF}<span color='red'>\t\tImpossible to display Infos,\n\t\t'NatronSetup' already running !</span></big>"
     fi
-    yad --center --on-top --title="Natron Update Info" --width=425 --height=280 --image="info" --text="${INFO}" --button="Fermer:0"  &
+    yad --center --on-top --title="Natron Update $RELEASES Info" --width=425 --height=280 --image="info" --text="${INFO}" --button="Fermer:0"  &
     }
 
 # Warning if yad is not installed
@@ -253,7 +256,8 @@ echo $XDG_CURRENT_DESKTOP | grep -q -i 'Unity' && export UNITY=1 || export UNITY
 export RELEASES
 VERSION=""
 
-#NATRON_PATH="/Path/to/Natron_Directory"
+# Natron install directory
+#NATRON_PATH="/Path/to/Natron_Directory" for releases ans snapshot installs
 if [[ $RELEASES == "releases" ]]
 then
     NATRON_PATH="${HOME}/bin/Natron"
@@ -335,7 +339,7 @@ echo 0 > $BLINKING # start without blinking !!
 yad --notification \
     --listen \
     --image="${ICON_NATRON}" \
-    --text="Natron updates ${COMMIT_TEXT}" \
+    --text="Natron updates $RELEASES${COMMIT_TEXT}" \
     --item-separator ":" \
     --command="bash -c '${NATRON_UPDATER}; check ${BLINKING} ${BLINK}'"  <&3 & export PID_YAD="$!"
 #Tray-icon contextual menu  
@@ -362,10 +366,10 @@ sleep 1m
 check ${BLINKING} ${BLINK} && echo "1ere verif faite"
 ##  then... check each days at $DATE_VERIF
 DATE_NOW=""
-DATE_VERIF=2200
+DATE_VERIF=00 # Every hours
 while :
 do
     [[ $DATE_NOW == $DATE_VERIF ]] && check ${BLINKING} ${BLINK} && echo $DATE_NOW: check done
     sleep 30 # low than the 1 minute
-    DATE_NOW=$(date +%H%M)
+    DATE_NOW=$(date +%M)
 done
