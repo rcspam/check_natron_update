@@ -1,5 +1,7 @@
 #Tray icon bash script to check natron snapshot updates.
 
+#### DEPRECATED DUE TO CHANGE (need login/passwd) ON natron.fr
+
 #### When snapshot updates are available:
 
 ![natron_blink](https://cloud.githubusercontent.com/assets/10021906/10069708/2f133234-62ae-11e5-9474-18d31b218ffa.gif) Tray icon blinks.
