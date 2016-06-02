@@ -1,6 +1,6 @@
 #Tray icon bash script to check natron snapshot updates.
-
-#### DEPRECATED DUE TO CHANGE (need login/passwd) ON natron.fr
+# DEPRECATED due to changes (need login/passwd) on natron.fr
+# No longer work  !!
 
 #### When snapshot updates are available:
 
